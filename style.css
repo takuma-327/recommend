@@ -323,16 +323,51 @@ footer {
     object-fit: cover;
 }
 
-/* --- スマホで見たときの調整（画面幅768px以下） --- */
-@media (max-width: 768px) {
-    .header-image-wrap {
-        max-width: 100px; /* スマホでは少し小さくしてスッキリさせる */
-        height: 100px;
-        border-width: 2px; /* 枠線も少し細くしてバランス調整 */
-    }
-    
-    header {
-        padding: 2rem 1rem 1rem 1rem; /* ヘッダー自体の余白も少しコンパクトにする */
-    }
+/* --- 1. 全体のハミ出しを物理的にブロックする超重要設定 --- */
+html, body {
+    overflow-x: hidden; /* 横方向のはみ出しを強制的に隠す */
+    width: 100%;
 }
+
+* {
+    box-sizing: border-box; /* paddingやborderが幅を押し広げるのを防ぐ */
+}
+
+/* --- 2. 画像やカードが親要素からはみ出さないようにする --- */
+img {
+    max-width: 100%;
+    height: auto; /* 画像の縦横比を保ったまま縮小させる */
+}
+
+.card, .adachi-profile, .container {
+    max-width: 100%;
+}
+
+/* --- 3. スマホ表示（768px以下）のときのレイアウト強制調整 --- */
+@media (max-width: 768px) {
+    /* コンテナの左右の余白を少しスッキリさせる */
+    .container {
+        padding: 1.5rem 0.8rem;
+    }
+
+    /* グリッドをスマホで確実に1列にする */
+    .grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.2rem;
+    }
+
+    /* 自己紹介プロフィールの縦並びとパディング調整 */
+    .adachi-profile {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem 1rem;
+        gap: 1rem;
+    }
+
+    /* ヘッダー画像のサイズ固定 */
+    .header-image-wrap {
+        width: 100px;
+        height: 100px;
+        max-width: 100px;
+    }
 }

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">大阪グルメ記事 | 足立さんおすすめ！</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="site-wrapper">
+
+        <!-- 左サイドバー -->
+        <aside class="side-navigation">
+            <div class="side-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <img src="image/header-adachi.jpeg" alt="足立さん" class="side-avatar">
+                    <h2>足立さんおすすめ！</h2>
+                    <p class="side-subtitle">大阪グルメと厳選商品</p>
+                </a>
+            </div>
+            
+            <nav class="nav-links">
+                <a href="index.html">← トップページへ戻る</a>
+                <a href="index.html#rice">厳選お米</a>
+                <a href="index.html#coffee">コーヒー豆</a>
+                <a href="index.html#side-dish">お惣菜・お供</a>
+                <a href="index.html#fruits">果物</a>
+                <a href="index.html#whisky">ウイスキー</a>
+                <a href="index.html#profile">案内人・著書紹介</a>
+            </nav>
+        </aside>
+
+        <!-- 右側：メインコンテンツ -->
+        <main class="main-content">
+
+            <!-- ステマ規制対策（PR表記） -->
+            <div style="font-size: 0.75rem; color: #888; margin-bottom: 1rem; background: #f9f9f9; padding: 4px 10px; border-radius: 4px; display: inline-block;">
+                ※ 当記事はアフィリエイト広告を利用しています
+            </div>
+
+            <article class="gourmet-article" id="article-container">
+                <!-- JSで本文が動的に流し込まれます -->
+            </article>
+
+            <!-- 記事連動：この記事に合う厳選商品エリア（動的生成） -->
+            <section id="pairing-section" style="margin-top: 4rem; padding-top: 2rem; border-top: 2px dashed #e2e8f0;">
+                <!-- JSで動的に差し込みます -->
+            </section>
+
+            <footer>
+                <p>&copy; 2026 足立さんおすすめ！厳選商品サイト All Rights Reserved.</p>
+            </footer>
+
+        </main>
+
+    </div>
+
+  <!-- 商品マスターと記事データの読み込み -->
+  <script src="products.js"></script>
+  <script src="articles.js"></script>
+  <script>
+  const params = new URLSearchParams(window.location.search);
+        const articleId = params.get('id') || "1";
+
+        const article = gourmetArticles.find(item => item.id === articleId);
+        const container = document.getElementById('article-container');
+        const pairingSection = document.getElementById('pairing-section');
+
+        if (article) {
+            document.getElementById('page-title').textContent = `${article.title} | 足立さんおすすめ！大阪グルメ`;
+
+            const paragraphsHtml = article.content.map(p => `<p style="margin-bottom: 1rem; line-height: 1.8;">${p}</p>`).join('');
+
+            // ギャラリー画像の生成
+            let galleryHtml = '';
+            if (article.gallery && article.gallery.length > 0) {
+                const imagesHtml = article.gallery.map(img => `
+                    <div style="aspect-ratio: 2 / 3; overflow: hidden; border-radius: 6px;">
+                        <img src="${img}" alt="ギャラリー画像" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                `).join('');
+                
+                galleryHtml = `
+                    <div class="article-gallery" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 2rem 0;">
+                        ${imagesHtml}
+                    </div>
+                `;
+            }
+
+            // ▼▼ 今回の追加：メイン画像（アイキャッチ）の生成 ▼▼
+            let heroImageHtml = '';
+            // article.image に .jpg や .png などの本物の画像パスが入っていれば画像を表示
+            if (article.image && (article.image.includes('.jpg') || article.image.includes('.jpeg') || article.image.includes('.png'))) {
+                heroImageHtml = `
+                <div class="article-hero-image" style="margin: 1.5rem 0; border-radius: 8px; overflow: hidden; height: 320px;">
+                    <img src="${article.image}" alt="メイン画像" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>`;
+            } else {
+                // 画像がない場合は従来のグレーの箱を表示
+                heroImageHtml = `
+                <div class="article-hero-image">
+                    <div class="card-img-placeholder" style="height: 320px; background: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #718096; border-radius: 8px; margin: 1.5rem 0;">
+                        ${article.imagePlaceholder || '画像準備中'}
+                    </div>
+                </div>`;
+            }
+
+            container.innerHTML = `
+                <div class="article-meta" style="margin-bottom: 1rem;">
+                    <span class="category-tag" style="${article.type === 'wishlist' ? 'background-color: #ffeaa7; color: #d35400;' : ''}">${article.tag}</span>
+                    <span class="article-date" style="font-size: 0.85rem; color: #888; margin-left: 10px;">${article.date}</span>
+                </div>
+                
+                <h1 class="article-title" style="font-size: 1.6rem; color: #2c3e50; margin-bottom: 1.2rem; line-height: 1.4;">${article.title}</h1>
+                
+                <p class="article-lead" style="font-size: 1rem; color: #555; background: #fdfdfd; padding: 1.2rem; border-radius: 6px; border-left: 3px solid #2c3e50; margin-bottom: 2rem;">${article.lead}</p>
+
+                <!-- ここでメイン画像（またはグレーの箱）を表示 -->
+                ${heroImageHtml}
+
+                <!-- ここでギャラリー画像を表示 -->
+                ${galleryHtml}
+
+                <section class="article-section" style="margin: 2rem 0;">
+                    ${paragraphsHtml}
+                </section>
+
+                <div class="review-box" style="margin: 2.5rem 0; padding: 1.5rem; background: #faf9f6; border-left: 4px solid ${article.type === 'wishlist' ? '#d35400' : '#2c3e50'}; border-radius: 0 8px 8px 0;">
+                    <h3 style="color: ${article.type === 'wishlist' ? '#d35400' : '#c0392b'}; margin-bottom: 0.8rem; font-size: 1.1rem;">【足立のガチ推しポイント】</h3>
+                    <p style="line-height: 1.7;">${article.adachiPoint}</p>
+                </div>
+
+                <section class="shop-info-box" style="background: #ffffff; border: 1px solid #eaeaea; border-radius: 8px; padding: 1.5rem; margin-top: 2rem;">
+                    <h3 style="font-size: 1.1rem; color: #2c3e50; margin-bottom: 0.8rem; border-bottom: 2px solid #eaeaea; padding-bottom: 0.4rem;">店舗情報</h3>
+                    <table style="width: 100%; font-size: 0.9rem; border-collapse: collapse;">
+                        <tr style="border-bottom: 1px solid #f4f4f4;"><th style="text-align: left; width: 28%; padding: 0.6rem 0; color: #666;">店名</th><td style="padding: 0.6rem 0;">${article.shopInfo.name}</td></tr>
+                        <tr style="border-bottom: 1px solid #f4f4f4;"><th style="text-align: left; padding: 0.6rem 0; color: #666;">ジャンル</th><td style="padding: 0.6rem 0;">${article.shopInfo.genre}</td></tr>
+                        <tr style="border-bottom: 1px solid #f4f4f4;"><th style="text-align: left; padding: 0.6rem 0; color: #666;">アクセス</th><td style="padding: 0.6rem 0;">${article.shopInfo.access}</td></tr>
+                        <tr><th style="text-align: left; padding: 0.6rem 0; color: #666;">予算</th><td style="padding: 0.6rem 0;">${article.shopInfo.budget}</td></tr>
+                    </table>
+                </section>
+            `;
+
+            if (article.relatedProductIds && article.relatedProductIds.length > 0) {
+                const matchedProducts = products.filter(p => article.relatedProductIds.includes(p.id));
+
+                pairingSection.innerHTML = `
+                    <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.8rem; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                        <span class="category-tag" style="background: #ebf8ff; color: #3182ce; margin-bottom: 0.6rem;">食のプロのペアリング提案</span>
+                        <h3 style="font-size: 1.25rem; color: #2c3e50; margin-bottom: 0.8rem;">この料理の余韻を、自宅でも楽しむなら</h3>
+                        <p style="font-size: 0.95rem; color: #555; line-height: 1.7; margin-bottom: 1.5rem;">${article.pairingComment}</p>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem;">
+                            ${matchedProducts.map(prod => `
+                                <div style="border: 1px solid #eee; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; background: #faf9f6;">
+                                    <div style="height: 160px; overflow: hidden; background: #fff;">
+                                        <img src="${prod.image}" alt="${prod.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                                    </div>
+                                    <div style="padding: 1rem; flex-grow: 1;">
+                                        <span style="font-size: 0.75rem; color: #888; font-weight: bold;">${prod.category}</span>
+                                        <h4 style="font-size: 1rem; color: #2c3e50; margin: 0.3rem 0 0.6rem 0;">${prod.name}</h4>
+                                        <p style="font-size: 0.85rem; color: #666; line-height: 1.5;">${prod.desc}</p>
+                                    </div>
+                                    <a href="${prod.url}" target="_blank" rel="noopener" class="affiliate-btn rakuten-btn" style="margin: 0 1rem 1rem 1rem; padding: 0.6rem; font-size: 0.85rem; text-decoration: none;">
+                                        ${prod.btnText} →
+                                    </a>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        } else {
+            container.innerHTML = '<p>指定された記事が見つかりませんでした。<a href="index.html">トップページへ戻る</a></p>';
+        }
+  </script>
+</body>
+</html>

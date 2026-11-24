@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>おすすめ商品（PR）一覧 | 足立さんおすすめ！大阪グルメ</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="site-wrapper">
+
+        <!-- 左サイドバー -->
+        <aside class="side-navigation">
+            <div class="side-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <img src="image/header-adachi.jpeg" alt="足立さん" class="side-avatar">
+                    <h2>足立さんおすすめ！</h2>
+                    <p class="side-subtitle">大阪グルメと厳選商品</p>
+                </a>
+            </div>
+            
+            <nav class="nav-links">
+                <a href="index.html">← トップページへ戻る</a>
+                <a href="list-gourmet.html">おすすめ飲食店 一覧</a>
+                <a href="list-wish.html">いきたい飲食店 一覧</a>
+                <!-- 現在のページをハイライト表示 -->
+                <a href="list-product.html" style="background: #f4f4f4; font-weight: bold; border-left: 4px solid #800000;">おすすめ商品（PR） 一覧</a>
+            </nav>
+        </aside>
+
+        <!-- 右側：メインコンテンツ -->
+        <main class="main-content">
+
+            <!-- ステマ規制対策（PR表記） -->
+            <div style="font-size: 0.75rem; color: #888; margin-top: 1rem; margin-bottom: 1rem; background: #f9f9f9; padding: 4px 10px; border-radius: 4px; display: inline-block;">
+                ※ 当サイトはアフィリエイト広告を利用しています
+            </div>
+
+            <div class="section-header">
+                <h1 id="page-title" style="font-size: 1.5rem; color: #800000; margin: 0;">おすすめ商品（PR） 一覧</h1>
+                <span>All Recommended Products</span>
+            </div>
+            <p style="font-size: 0.95rem; color: #666; margin-bottom: 1.5rem; line-height: 1.6;">
+                現場の目利きで選び抜いた、自宅でも楽しめる厳選グルメやおすすめ商品の一覧です。カテゴリーから絞り込んでご覧いただけます。
+            </p>
+
+            <!-- カテゴリー切り替えボタン（JSで自動生成） -->
+            <div id="category-filters" style="display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 2rem;"></div>
+
+            <!-- 商品一覧を自動生成するグリッド -->
+            <div class="grid" id="all-product-grid">
+                <!-- JSで自動生成 -->
+            </div>
+
+            <footer style="margin-top: 4rem;">
+                <p>&copy; 2026 足立さんおすすめ！厳選商品サイト All Rights Reserved.</p>
+            </footer>
+
+        </main>
+    </div>
+
+    <!-- データ読み込み ＆ カテゴリー絞り込み一覧の自動生成 -->
+    <script src="products.js"></script>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const currentCat = params.get('cat') || 'すべて';
+
+        const filterContainer = document.getElementById('category-filters');
+        const grid = document.getElementById('all-product-grid');
+        const pageTitle = document.getElementById('page-title');
+
+        if (typeof products !== 'undefined') {
+            // 1. カテゴリー一覧を重複なしで取得（「すべて」を先頭に追加）
+            const categories = ['すべて', ...new Set(products.map(p => p.category))];
+
+            // 2. カテゴリーボタンを生成
+            if (filterContainer) {
+                filterContainer.innerHTML = categories.map(cat => {
+                    const isActive = cat === currentCat;
+                    const href = cat === 'すべて' ? 'list-product.html' : `list-product.html?cat=${encodeURIComponent(cat)}`;
+                    const style = isActive
+                        ? 'background: #800000; color: #fff; border: 2px solid #800000;'
+                        : 'background: #fff; color: #800000; border: 2px solid #800000;';
+                    return `<a href="${href}" style="display: inline-block; padding: 0.45rem 1.2rem; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 0.9rem; transition: 0.2s; ${style}">${cat}</a>`;
+                }).join('');
+            }
+
+            // 3. 見出しを更新
+            if (pageTitle && currentCat !== 'すべて') {
+                pageTitle.textContent = `おすすめ商品（PR）：${currentCat}`;
+            }
+
+            // 4. 該当カテゴリーの商品を絞り込み
+            const filteredProducts = currentCat === 'すべて'
+                ? products
+                : products.filter(p => p.category === currentCat);
+
+            // 5. 商品カードを生成（リンク先を product.html?id=... に変更）
+            if (grid) {
+                if (filteredProducts.length > 0) {
+                    grid.innerHTML = filteredProducts.map(prod => `
+                        <article class="card">
+                            <div class="card-image-wrap">
+                                <img src="${prod.image}" alt="${prod.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            <div class="card-content">
+                                <span class="category-tag" style="background: #f4f4f4; color: #555;">${prod.category}</span>
+                                <h3>${prod.name}</h3>
+                                <p class="card-desc">${prod.desc}</p>
+                            </div>
+                            <a href="product.html?id=${prod.id}" class="affiliate-btn" style="background-color: #800000;">詳細・目利き記事を読む →</a>
+                        </article>
+                    `).join('');
+                } else {
+                    grid.innerHTML = '<p style="color: #666;">このカテゴリーの商品はまだ登録されていません。</p>';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

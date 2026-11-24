@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品詳細 | 足立さんおすすめ！大阪グルメ</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="site-wrapper">
+
+        <!-- 左サイドバー -->
+        <aside class="side-navigation">
+            <div class="side-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <img src="image/header-adachi.jpeg" alt="足立さん" class="side-avatar">
+                    <h2>足立さんおすすめ！</h2>
+                    <p class="side-subtitle">大阪グルメと厳選商品</p>
+                </a>
+            </div>
+            
+            <nav class="nav-links">
+                <a href="index.html">← トップページへ戻る</a>
+                <a href="list-gourmet.html">おすすめ飲食店 一覧</a>
+                <a href="list-wish.html">いきたい飲食店 一覧</a>
+                <a href="list-product.html" style="background: #f4f4f4; font-weight: bold; border-left: 4px solid #800000;">おすすめ商品（PR） 一覧</a>
+            </nav>
+        </aside>
+
+        <!-- 右側：メインコンテンツ -->
+        <main class="main-content">
+
+            <!-- ステマ規制対策（PR表記） -->
+            <div style="font-size: 0.75rem; color: #888; margin-top: 1rem; margin-bottom: 1rem; background: #f9f9f9; padding: 4px 10px; border-radius: 4px; display: inline-block;">
+                ※ 当サイトはアフィリエイト広告を利用しています
+            </div>
+
+            <!-- 商品記事の本体（JSで自動生成） -->
+            <article id="product-detail" style="background: #fff; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                <p>読み込み中...</p>
+            </article>
+
+            <footer style="margin-top: 4rem;">
+                <p>&copy; 2026 足立さんおすすめ！厳選商品サイト All Rights Reserved.</p>
+            </footer>
+
+        </main>
+    </div>
+
+    <!-- データ読み込み ＆ 商品記事の自動生成 -->
+    <script src="products.js"></script>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const productId = params.get('id');
+        const container = document.getElementById('product-detail');
+
+        if (container && typeof products !== 'undefined') {
+            const prod = products.find(p => p.id === productId);
+
+            if (prod) {
+                // ページタイトルを商品名に変更
+                document.title = `${prod.name} | 足立さんおすすめ！`;
+
+                // 本文（content配列）を段落HTMLに変換
+                const contentHtml = (prod.content || [prod.desc]).map(paragraph => 
+                    `<p style="line-height: 1.9; color: #333; margin-bottom: 1.5rem; font-size: 1rem;">${paragraph}</p>`
+                ).join('');
+
+                // 目利きポイント枠
+                const pointHtml = prod.adachiPoint ? `
+                    <div style="background: #fff8f0; border-left: 4px solid #800000; padding: 1.2rem 1.5rem; border-radius: 0 8px 8px 0; margin: 2rem 0;">
+                        <h3 style="margin: 0 0 0.5rem 0; font-size: 1.05rem; color: #800000;">足立の目利きポイント</h3>
+                        <p style="margin: 0; line-height: 1.8; color: #444; font-size: 0.95rem;">${prod.adachiPoint}</p>
+                    </div>
+                ` : '';
+
+                container.innerHTML = `
+                    <div style="margin-bottom: 1rem;">
+                        <a href="list-product.html?cat=${encodeURIComponent(prod.category)}" class="category-tag" style="background: #f4f4f4; color: #555; text-decoration: none; display: inline-block;">${prod.category}</a>
+                    </div>
+                    <h1 style="font-size: 1.6rem; color: #2c3e50; margin: 0 0 1rem 0; line-height: 1.4;">${prod.name}</h1>
+                    <p style="font-size: 1rem; color: #666; margin-bottom: 1.5rem; line-height: 1.6;">${prod.desc}</p>
+
+                    <div style="width: 100%; max-height: 420px; overflow: hidden; border-radius: 10px; margin-bottom: 2rem;">
+                        <img src="${prod.image}" alt="${prod.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                    </div>
+
+                    <div class="product-body">
+                        ${contentHtml}
+                    </div>
+
+                    ${pointHtml}
+
+                    <!-- アフィリエイトリンク枠 -->
+                    <div style="text-align: center; margin: 2.5rem 0 1.5rem 0; padding: 1.5rem; background: #fafafa; border: 1px solid #eee; border-radius: 10px;">
+                        <p style="font-size: 0.9rem; color: #666; margin: 0 0 1rem 0;">商品の詳細・最新価格はこちらからチェックできます</p>
+                        <a href="${prod.url}" target="_blank" rel="noopener" class="affiliate-btn rakuten-btn" style="background-color: #bf0000; display: inline-block; padding: 1rem 2.5rem; font-size: 1.05rem; border-radius: 30px;">${prod.btnText} →</a>
+                    </div>
+
+                    <!-- カテゴリー一覧へ戻る導線 -->
+                    <div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #eee;">
+                        <a href="list-product.html?cat=${encodeURIComponent(prod.category)}" style="color: #800000; text-decoration: none; font-weight: bold;">← 「${prod.category}」の商品一覧に戻る</a>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <p style="color: #666;">指定された商品が見つかりませんでした。</p>
+                    <p><a href="list-product.html" style="color: #800000;">おすすめ商品一覧へ戻る</a></p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

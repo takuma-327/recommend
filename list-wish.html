@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>いきたい飲食店一覧 | 足立さんおすすめ！大阪グルメ</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="site-wrapper">
+
+        <!-- 左サイドバー -->
+        <aside class="side-navigation">
+            <div class="side-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <img src="image/header-adachi.jpeg" alt="足立さん" class="side-avatar">
+                    <h2>足立さんおすすめ！</h2>
+                    <p class="side-subtitle">大阪グルメと厳選商品</p>
+                </a>
+            </div>
+            
+            <nav class="nav-links">
+                <a href="index.html">← トップページへ戻る</a>
+                <a href="list-gourmet.html">おすすめ飲食店 一覧</a>
+                <!-- 現在のページをハイライト表示 -->
+                <a href="list-wish.html" style="background: #f4f4f4; font-weight: bold; border-left: 4px solid #d35400;">いきたい飲食店 一覧</a>
+                <a href="list-product.html">おすすめ商品（PR） 一覧</a>
+            </nav>
+        </aside>
+
+        <!-- 右側：メインコンテンツ -->
+        <main class="main-content">
+
+            <!-- ステマ規制対策（PR表記） -->
+            <div style="font-size: 0.75rem; color: #888; margin-top: 1rem; margin-bottom: 1rem; background: #f9f9f9; padding: 4px 10px; border-radius: 4px; display: inline-block;">
+                ※ 当サイトはアフィリエイト広告を利用しています
+            </div>
+
+            <div class="section-header">
+                <h1 style="font-size: 1.5rem; color: #d35400; margin: 0;">いきたい飲食店 一覧</h1>
+                <span>All Wishlist Restaurants</span>
+            </div>
+            <p style="font-size: 0.95rem; color: #666; margin-bottom: 2rem; line-height: 1.6;">
+                足立が今気になっている、これから足を運んでみたい大阪の注目店リストです。
+            </p>
+
+            <!-- 記事一覧を自動生成するグリッド -->
+            <div class="grid" id="all-wish-grid">
+                <!-- JSで全件自動生成 -->
+            </div>
+
+            <footer style="margin-top: 4rem;">
+                <p>&copy; 2026 足立さんおすすめ！厳選商品サイト All Rights Reserved.</p>
+            </footer>
+
+        </main>
+    </div>
+
+    <!-- データ読み込み ＆ 一覧の自動生成 -->
+    <script src="articles.js"></script>
+    <script>
+        // type が 'wishlist' の記事を【すべて】取得する
+        const allWishes = gourmetArticles.filter(a => a.type === 'wishlist');
+        const grid = document.getElementById('all-wish-grid');
+        
+        if (grid) {
+            if (allWishes.length > 0) {
+                grid.innerHTML = allWishes.map(article => `
+                    <article class="card">
+                        <div class="card-image-wrap" style="height: 180px; overflow: hidden;">
+                            <img src="${article.image}" alt="${article.title}" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div class="card-content">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span class="category-tag" style="background-color: #ffeaa7; color: #d35400;">${article.tag}</span>
+                                <span style="font-size: 0.8rem; color: #999;">${article.date}</span>
+                            </div>
+                            <h3 style="margin-top: 0.5rem;">${article.title}</h3>
+                            <p class="card-desc">${article.lead.substring(0, 55)}...</p>
+                        </div>
+                        <a href="article.html?id=${article.id}" class="affiliate-btn" style="background-color: #d35400;">気になる理由を見る →</a>
+                    </article>
+                `).join('');
+            } else {
+                grid.innerHTML = '<p style="color: #666;">現在登録されているいきたい飲食店はありません。</p>';
+            }
+        }
+    </script>
+</body>
+</html>
